@@ -22,12 +22,12 @@ services:
             - db
         volumes:
             - ../wordpress:/var/www/html
+            - ./config/php/wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini
         environment:
             - WORDPRESS_DB_HOST=db
             - WORDPRESS_DB_USER=${DB_USER}
             - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
             - WORDPRESS_DB_NAME=${DB_NAME}
-        env_file: .env
 
     webserver:
         image: nginx:latest
