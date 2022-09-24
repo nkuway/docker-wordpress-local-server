@@ -38,9 +38,12 @@ services:
         ports:
             - "80:80"
             - "443:443"
+        environment:
+            - DOMAIN=${DOMAIN}
+            - NGINX_PORT=80
         volumes:
             - ../wordpress:/var/www/html
-            - ./nginx/:/etc/nginx/conf.d
+            - ./config/nginx:/etc/nginx/templates
             - ./certs:/etc/certs
 
     # Redis container
