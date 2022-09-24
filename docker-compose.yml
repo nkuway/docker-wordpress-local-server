@@ -1,29 +1,11 @@
-version: '3.9'
+version: '3.8'
 
 services:
-
-    wp:
-        image: wordpress:latest
-        ports:
-            - "80:80"
-        volumes:
-            - ./config/php.conf.ini:/usr/local/etc/php/conf.d/conf.ini
-            - ../wp-app:/var/www/html
-        environment:
-            WORDPRESS_DB_HOST: db
-            WORDPRESS_DB_NAME: ${DB_NAME}
-            WORDPRESS_DB_USER: ${DB_USER}
-            WORDPRESS_DB_PASSWORD: ${DB_PASSWORD}
-        depends_on:
-            - db
-        links:
-            - db
 
     db:
         image: mariadb
         container_name: ${APP_NAME}-mysql
-        ports:
-            - "3306:3306"
+        restart: always
         volumes:
             - ./database:/var/lib/mysql:delegated
         environment:
@@ -31,4 +13,48 @@ services:
             - MYSQL_USER=${DB_USER}
             - MYSQL_PASSWORD=${DB_PASSWORD}
             - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
-        restart: always
+
+    wordpress:
+        image: wordpress:6.0.2-fpm-alpine
+        container_name: ${APP_NAME}-wordpress
+        restart: unless-stopped
+        depends_on:
+            - db
+        volumes:
+            - ../wordpress:/var/www/html
+        environment:
+            - WORDPRESS_DB_HOST=db
+            - WORDPRESS_DB_USER=${DB_USER}
+            - WORDPRESS_DB_PASSWORD=${DB_PASSWORD}
+            - WORDPRESS_DB_NAME=${DB_NAME}
+        env_file: .env
+
+    webserver:
+        image: nginx:latest
+        container_name: ${APP_NAME}-webserver
+        restart: unless-stopped
+        depends_on:
+            - wordpress
+        ports:
+            - "80:80"
+            - "443:443"
+        volumes:
+            - ../wordpress:/var/www/html
+            - ./nginx/:/etc/nginx/conf.d
+            - ./certs:/etc/certs
+
+    # Redis container
+    # Uncomment for installing Redis container
+    # redis:
+    #     image: arm64v8/redis:latest
+    #     container_name: ${APP_NAME}-redis
+    #     environment:
+    #         - ALLOW_EMPTY_PASSWORD=yes
+    #     ports:
+    #         - '6379:6379'
+    #     volumes:
+    #         - ./redis_database:/bitnami/redis/data
+
+volumes:
+    wordpress:
+    database:
