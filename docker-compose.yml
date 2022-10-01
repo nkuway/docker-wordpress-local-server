@@ -23,6 +23,7 @@ services:
         volumes:
             - ../wordpress:/var/www/html
             - ./config/php/wordpress.ini:/usr/local/etc/php/conf.d/wordpress.ini
+            #- /path/to/local-theme:/var/www/html/wp-content/themes/
         environment:
             - WORDPRESS_DB_HOST=db
             - WORDPRESS_DB_USER=${DB_USER}
