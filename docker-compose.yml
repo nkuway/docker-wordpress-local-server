@@ -15,7 +15,7 @@ services:
             - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
 
     wordpress:
-        image: wordpress:6.0.2-fpm-alpine
+        image: wordpress:6.0.3-fpm-alpine
         container_name: ${APP_NAME}-wordpress
         restart: unless-stopped
         depends_on:
